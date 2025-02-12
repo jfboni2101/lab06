@@ -26,17 +26,22 @@ def spectral_clustering(data, n_cl, sigma=1., fiedler_solution=False):
     ndarray
         computed assignment. Has shape (n_samples,)
     """
+    if fiedler_solution and n_cl != 2:
+        raise Exception("Cannot apply Fiedler to more than 2 clusters!")
+
+    # dist matrix
+    dist_matrix = ((np.expand_dims(data, 0) - np.expand_dims(data, 1)) ** 2).sum(axis=-1)
     # compute affinity matrix
-    affinity_matrix = ...
+    affinity_matrix = np.exp(-dist_matrix / (sigma ** 2))
 
     # compute degree matrix
-    degree_matrix = ...
+    degree_matrix = np.diag(affinity_matrix.sum(1))
 
     # compute laplacian
-    laplacian_matrix = ...
+    laplacian_matrix = degree_matrix - affinity_matrix
 
     # compute eigenvalues and vectors (suggestion: np.linalg is your friend)
-    eigenvalues, eigenvectors = np.random.rand(2, 10), np.random.rand(10, 10)  # TODO
+    eigenvalues, eigenvectors = np.linalg.eig(laplacian_matrix)
 
     # ensure we are not using complex numbers - you shouldn't btw
     if eigenvalues.dtype == 'complex128':
@@ -44,13 +49,15 @@ def spectral_clustering(data, n_cl, sigma=1., fiedler_solution=False):
         eigenvalues, eigenvectors = eigenvalues.real, eigenvectors.real
 
     # sort eigenvalues and vectors
-    eigenvalues, eigenvectors = np.random.rand(2, 10), np.random.rand(10, 10)  # TODO
+    sorted_indices = np.argsort(eigenvalues)
+    eigenvalues = eigenvalues[sorted_indices]
+    eigenvectors = eigenvectors[:, sorted_indices]
 
     # SOLUTION A: Fiedler-vector solution
     # - consider only the SECOND smallest eigenvector
     # - threshold it at zero
     # - return as labels
-    labels = ...
+    labels = eigenvectors[:, 1] > 0
     if fiedler_solution:
         return labels
 
@@ -59,8 +66,8 @@ def spectral_clustering(data, n_cl, sigma=1., fiedler_solution=False):
     # - use them as features instead of data for KMeans
     # - You want to use sklearn's implementation (;
     # - return KMeans' clusters
-    new_features = ...
-    labels = np.random.randint(0, n_cl, size=data.shape[0])  # TODO
+    new_features = eigenvectors[:, 1:n_cl + 1]
+    labels = KMeans(n_cl).fit_predict(new_features)
 
     return labels
 
@@ -79,7 +86,7 @@ def main_spectral_clustering():
     ax[0].scatter(data[:, 0], data[:, 1], c=cl, s=40)
 
     # run spectral clustering - tune n_cl and sigma!!!
-    labels = spectral_clustering(data, n_cl=15, sigma=0.009)
+    labels = spectral_clustering(data, n_cl=2, sigma=0.009)
 
     # visualize results
     ax[1].scatter(data[:, 0], data[:, 1], c=labels, s=40)
