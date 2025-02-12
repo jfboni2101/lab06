@@ -50,8 +50,7 @@ def spectral_clustering(data, n_cl, sigma=1., fiedler_solution=False):
 
     # sort eigenvalues and vectors
     sorted_indices = np.argsort(eigenvalues)
-    eigenvalues = eigenvalues[sorted_indices]
-    eigenvectors = eigenvectors[:, sorted_indices]
+    eigenvalues, eigenvectors = eigenvalues[sorted_indices], eigenvectors[:, sorted_indices]
 
     # SOLUTION A: Fiedler-vector solution
     # - consider only the SECOND smallest eigenvector
@@ -67,7 +66,7 @@ def spectral_clustering(data, n_cl, sigma=1., fiedler_solution=False):
     # - You want to use sklearn's implementation (;
     # - return KMeans' clusters
     new_features = eigenvectors[:, 1:n_cl + 1]
-    labels = KMeans(n_cl).fit_predict(new_features)
+    labels = KMeans(n_cl, n_init='auto').fit_predict(new_features)
 
     return labels
 
@@ -86,7 +85,7 @@ def main_spectral_clustering():
     ax[0].scatter(data[:, 0], data[:, 1], c=cl, s=40)
 
     # run spectral clustering - tune n_cl and sigma!!!
-    labels = spectral_clustering(data, n_cl=2, sigma=0.009)
+    labels = spectral_clustering(data, n_cl=2, sigma=0.1, fiedler_solution=True)
 
     # visualize results
     ax[1].scatter(data[:, 0], data[:, 1], c=labels, s=40)
