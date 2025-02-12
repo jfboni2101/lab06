@@ -77,15 +77,15 @@ def main_spectral_clustering():
     """
 
     # generate the dataset
-    data, cl = two_moon_dataset(n_samples=300, noise=0.1)
-    # data, cl = gaussians_dataset(n_gaussian=3, n_points=[100, 100, 70], mus=[[1, 1], [-4, 6], [8, 8]], stds=[[1, 1], [3, 3], [1, 1]])
+    # data, cl = two_moon_dataset(n_samples=300, noise=0.1)
+    data, cl = gaussians_dataset(n_gaussian=3, n_points=[100, 100, 70], mus=[[1, 1], [-4, 6], [8, 8]], stds=[[1, 1], [3, 3], [1, 1]])
 
     # visualize the dataset
     _, ax = plt.subplots(1, 2)
     ax[0].scatter(data[:, 0], data[:, 1], c=cl, s=40)
 
     # run spectral clustering - tune n_cl and sigma!!!
-    labels = spectral_clustering(data, n_cl=2, sigma=0.1, fiedler_solution=True)
+    labels = spectral_clustering(data, n_cl=3, sigma=2, fiedler_solution=False)
 
     # visualize results
     ax[1].scatter(data[:, 0], data[:, 1], c=labels, s=40)
