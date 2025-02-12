@@ -30,7 +30,7 @@ def spectral_clustering(data, n_cl, sigma=1., fiedler_solution=False):
         raise Exception("Cannot apply Fiedler to more than 2 clusters!")
 
     # dist matrix
-    dist_matrix = ((np.expand_dims(data, 0) - np.expand_dims(data, 1)) ** 2).sum(axis=-1)
+    dist_matrix = ((np.expand_dims(data, 0) - np.expand_dims(data, 1)) ** 2).sum(-1)
     # compute affinity matrix
     affinity_matrix = np.exp(-dist_matrix / (sigma ** 2))
 
